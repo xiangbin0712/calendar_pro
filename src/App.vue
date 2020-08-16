@@ -1,32 +1,41 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <my-header>{{ headerTitle }}</my-header>
+    <tab />
+    <router-view />
   </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script>
+import Tab from "@/components/Tab";
+import MyHeader from "@/components/Header";
 
-#nav {
-  padding: 30px;
+import { computed, watch } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
-  a {
-    font-weight: bold;
-    color: #2c3e50;
+export default {
+  name: "App",
+  components: {
+    Tab,
+    MyHeader,
+  },
+  setup() {
+    const store = useStore(),
+      state = store.state,
+      router = useRouter();
 
-    &.router-link-exact-active {
-      color: #42b983;
-    }
-  }
-}
-</style>
+    // 单页面应用 刷新回到首页
+    router.push("/");
+
+    // 监听路由变化
+    watch(
+      () => router.currentRoute.value.name,
+      value => {
+        store.commit("setHeaderTitle", value);
+      }
+    );
+    return computed(() => state).value;
+  },
+};
+</script>
